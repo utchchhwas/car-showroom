@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ManufacturerHomePageController">
+    <children>
+        <Label alignment="CENTER" layoutX="640.0" layoutY="14.0" prefHeight="38.0" prefWidth="142.0" text="Logged In as {User}">
+            <font>
+                <Font name="System Bold" size="15.0" />
+            </font></Label>
+        <Button fx:id="logoutBtn" layoutX="640.0" layoutY="547.0" mnemonicParsing="false" onAction="#logoutBtnPressed" prefHeight="38.0" prefWidth="150.0" text="Log Out" />
+        <TableView fx:id="tableView" layoutX="6.0" layoutY="68.0" prefHeight="525.0" prefWidth="626.0">
+            <columns>
+                <TableColumn fx:id="regCol" prefWidth="86.4000244140625" text="Reg. No." />
+                <TableColumn fx:id="yearCol" prefWidth="76.0" text="Year Made" />
+                <TableColumn fx:id="colorsCol" prefWidth="126.4000244140625" text="Colors" />
+                <TableColumn fx:id="makeCol" prefWidth="97.60003662109375" text="Car Make" />
+                <TableColumn fx:id="modelCol" prefWidth="86.39996337890625" text="Car Model" />
+                <TableColumn fx:id="priceCol" minWidth="0.0" prefWidth="87.20001220703125" text="Price" />
+                <TableColumn fx:id="quantityCol" prefWidth="59.20001220703125" text="Quantity" />
+            </columns>
+        </TableView>
+        <Button fx:id="addCarBtn" layoutX="642.0" layoutY="292.0" mnemonicParsing="false" onAction="#addCarBtnPressed" prefHeight="38.0" prefWidth="150.0" text="Add Car" />
+        <Button fx:id="deleteCarBtn" layoutX="643.0" layoutY="348.0" mnemonicParsing="false" onAction="#deleteCarBtnPressed" prefHeight="38.0" prefWidth="150.0" text="Delete Car">
+            <font>
+                <Font size="10.0" />
+            </font>
+        </Button>
+        <Line endX="100.0" layoutX="688.0" layoutY="532.0" startX="-46.20001220703125" />
+        <Label alignment="CENTER" layoutX="204.0" layoutY="9.0" prefHeight="48.0" prefWidth="229.0" text="Car Showroom">
+            <font>
+                <Font name="Oswald Medium" size="25.0" />
+            </font>
+        </Label>
+        <Button fx:id="refreshBtn" layoutX="642.0" layoutY="75.0" mnemonicParsing="false" onAction="#refreshBtnPressed" prefHeight="38.0" prefWidth="145.0" text="Refresh" />
+        <Line endX="100.0" layoutX="688.0" layoutY="133.0" startX="-46.4000244140625" startY="-1.52587890625E-5" />
+      <Button fx:id="editCarBtn" layoutX="643.0" layoutY="231.0" mnemonicParsing="false" onAction="#editCarBtnPressed" prefHeight="38.0" prefWidth="148.0" text="Edit Car" />
+    </children>
+</AnchorPane>
