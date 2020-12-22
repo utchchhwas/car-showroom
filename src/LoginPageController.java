@@ -8,16 +8,20 @@ import javafx.scene.control.TextField;
 import java.io.IOException;
 
 public class LoginPageController {
-    public Button resetButton;
-    public Button logInButton;
-    public TextField usernameField;
-    public PasswordField passwordField;
+    @FXML
+    private Button resetButton;
+    @FXML
+    private Button logInButton;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
 
     private App app = null;
 
     @FXML
     private void initialize() {
-        Debug.debug("In initializer of " + getClass().getName());
+        Debug.debug("in initializer of " + getClass().getName());
     }
 
     public void setApp(App app) {
@@ -25,25 +29,30 @@ public class LoginPageController {
     }
 
     public void logInButtonClicked(ActionEvent actionEvent) {
-        Debug.debug("Log In button clicked");
+        Debug.debug("Login button clicked");
 
+        // check if the username is blank
         if (usernameField.getText().equals("")) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Please provide a username");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("Please enter a username");
             alert.showAndWait();
             return;
         }
 
+        Debug.debug("username: " + usernameField.getText() + ", password: " + passwordField.getText());
+        // send login-in request
         try {
-            app.getNetUtil().sendLoginRequest(usernameField.getText(), passwordField.getText());
+            app.getNetUtil().loginRequest(usernameField.getText(), passwordField.getText());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void resetButtonClicked(ActionEvent actionEvent) {
-        Debug.debug("Reset button clicked");
+        reset();
+    }
 
+    public void reset() {
         usernameField.clear();
         passwordField.clear();
     }

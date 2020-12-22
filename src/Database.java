@@ -33,7 +33,7 @@ public class Database {
     }
 
 
-    public String getPassword(String username) throws SQLException {
+    synchronized public String getPassword(String username) throws SQLException {
         setConnection();
 
         String password = null;
@@ -50,7 +50,7 @@ public class Database {
         return password;
     }
 
-    public boolean buyCar(String reg) throws SQLException {
+    synchronized public boolean buyCar(String reg) throws SQLException {
         setConnection();
 
         boolean flag = false;
@@ -73,45 +73,7 @@ public class Database {
         return flag;
     }
 
-    void showAllUsers() throws SQLException {
-        setConnection();
-
-        sql = "SELECT * FROM users";
-        ps = connection.prepareStatement(sql);
-        res = ps.executeQuery();
-        while (res.next()) {
-            Debug.debug("userId: " + res.getString("userId") +
-                    ", username: " + res.getString("username") +
-                    ", password: " + res.getString("password"));
-        }
-
-        close();
-    }
-
-    void showAllCars() throws SQLException {
-        setConnection();
-
-        ArrayList<Car> cars = new ArrayList<>();
-
-        sql = "SELECT * FROM cars";
-        ps = connection.prepareStatement(sql);
-        res = ps.executeQuery();
-        while (res.next()) {
-            cars.add(new Car(res.getString(1), res.getInt(2),
-                    res.getString(3), res.getString(4),
-                    res.getString(5), res.getString(6),
-                    res.getString(7), res.getInt(8),
-                    res.getInt(9)));
-        }
-
-        for (var car : cars) {
-            car.printInfo();
-        }
-
-        close();
-    }
-
-    public Car getCar(String reg) throws SQLException {
+    synchronized public Car getCar(String reg) throws SQLException {
         setConnection();
 
         Car car = null;
@@ -126,14 +88,44 @@ public class Database {
                     res.getString(5), res.getString(6),
                     res.getString(7), res.getInt(8),
                     res.getInt(9));
-            car.printInfo();
         }
 
         close();
         return car;
     }
 
-    public ArrayList<Car> getAllCars() throws SQLException {
+    synchronized public ArrayList<Car> getCar(String make, String model) throws SQLException {
+        setConnection();
+
+        ArrayList<Car> cars = new ArrayList<>();
+
+        if (model.equals("")) {
+            sql = "SELECT * FROM cars WHERE make = ?";
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, make);
+        }
+        else {
+            sql = "SELECT * FROM cars WHERE make = ? AND model = ?";
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, make);
+            ps.setString(2, model);
+        }
+        res = ps.executeQuery();
+        while (res.next()) {
+            cars.add(new Car(
+                    res.getString(1), res.getInt(2),
+                    res.getString(3), res.getString(4),
+                    res.getString(5), res.getString(6),
+                    res.getString(7), res.getInt(8),
+                    res.getInt(9))
+            );
+        }
+
+        close();
+        return cars;
+    }
+
+    synchronized public ArrayList<Car> getAllCars() throws SQLException {
         setConnection();
 
         ArrayList<Car> cars = new ArrayList<>();
@@ -153,8 +145,35 @@ public class Database {
         return cars;
     }
 
-    public static void main(String[] args) throws SQLException {
-        Database db = Database.getDatabase();
-        db.buyCar("1YX98J");
+    synchronized public void deleteCar(String reg) throws SQLException {
+        setConnection();
+
+        sql = "DELETE FROM cars WHERE reg = ?";
+        ps = connection.prepareStatement(sql);
+        ps.setString(1, reg);
+        ps.execute();
+
+        close();
+    }
+
+    synchronized public void addCar(Car car) throws SQLException {
+        setConnection();
+
+        sql = "INSERT INTO cars(" +
+                "reg,year,color1,color2,color3,make,model,price,quantity) " +
+                "VALUES(?,?,?,?,?,?,?,?,?)";
+        ps = connection.prepareStatement(sql);
+        ps.setString(1, car.getReg());
+        ps.setInt(2, car.getYear());
+        ps.setString(3, car.getColor1());
+        ps.setString(4, car.getColor2());
+        ps.setString(5, car.getColor3());
+        ps.setString(6, car.getMake());
+        ps.setString(7, car.getModel());
+        ps.setInt(8, car.getPrice());
+        ps.setInt(9, car.getQuantity());
+        ps.execute();
+
+        close();
     }
 }

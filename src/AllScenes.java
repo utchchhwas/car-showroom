@@ -14,14 +14,19 @@ public class AllScenes {
     Scene loginPage = null;
     LoginPageController loginPageController = null;
 
-    Scene viewerHomePage = null;
-    ViewerHomePageController viewerHomePageController = null;
+    Scene homePage = null;
+    HomePageController homePageController = null;
+
+    Scene extraPage = null;
+    ExtraPageController extraPageController = null;
 
     public AllScenes(App app) {
         this.app = app;
     }
 
     private void loadLoginPage() {
+        Debug.debug("Loading login page...");
+
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(app.getClass().getResource("login-page.fxml"));
         try {
@@ -33,6 +38,8 @@ public class AllScenes {
             e.printStackTrace();
             System.exit(1);
         }
+
+        Debug.debug("Successfully loaded login page");
     }
 
     public Scene getLoginPage() {
@@ -49,34 +56,67 @@ public class AllScenes {
         return loginPageController;
     }
 
-    private void loadViewerHomePage() {
-        Debug.debug("Loading viewer home page...");
+    private void loadHomePage() {
+        Debug.debug("Loading home page...");
+
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(app.getClass().getResource("viewer-home-page.fxml"));
+        loader.setLocation(app.getClass().getResource("home-page.fxml"));
         try {
             Parent root = loader.load();
-            viewerHomePage = new Scene(root, 800, 600);
-            viewerHomePageController = loader.getController();
-            viewerHomePageController.setApp(app);
+            homePage = new Scene(root, 800, 600);
+            homePageController = loader.getController();
+            homePageController.setApp(app);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
-        Debug.debug("Successfully loaded viewer home page");
+
+        Debug.debug("Successfully loaded home page");
     }
 
-    public Scene getViewerHomePage() {
-        if (viewerHomePage == null) {
-            loadViewerHomePage();
+    public Scene getHomePage() {
+        if (homePage == null) {
+            loadHomePage();
         }
-        return viewerHomePage;
+        return homePage;
     }
 
-    public ViewerHomePageController getViewerHomePageController() {
-        if (viewerHomePageController == null) {
-            loadViewerHomePage();
+    public HomePageController getHomePageController() {
+        if (homePageController == null) {
+            loadHomePage();
         }
-        return viewerHomePageController;
+        return homePageController;
+    }
+
+    private void loadExtraPage() {
+        Debug.debug("Loading extra page...");
+
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(app.getClass().getResource("extra-page.fxml"));
+        try {
+            Parent root = loader.load();
+            extraPage = new Scene(root, 800, 600);
+            extraPageController = loader.getController();
+            extraPageController.setApp(app);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        Debug.debug("Successfully loaded extra page");
+    }
+
+    public Scene getExtraPage() {
+        if (extraPage == null) {
+            loadExtraPage();
+        }
+        return extraPage;
+    }
+
+    public ExtraPageController getEditCarPageController() {
+        if (extraPageController == null) {
+            loadExtraPage();
+        }
+        return extraPageController;
     }
 
 }

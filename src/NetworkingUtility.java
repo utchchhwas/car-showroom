@@ -10,12 +10,15 @@ public class NetworkingUtility {
     private final App app;
 
     private final int PORT = 9192;
-    private Socket socket;
+    private final Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private Thread listeningThread = null;
     private String user = null;
 
+    public void setUser(String user) {
+        this.user = user;
+    }
 
     public NetworkingUtility(App app) throws Exception {
         Debug.debug("Creating NetworkingUtility");
@@ -89,7 +92,6 @@ public class NetworkingUtility {
                 }
             }
 
-
             Debug.debug("Closing " + Thread.currentThread().getName());
         });
         listeningThread.start();
@@ -107,123 +109,155 @@ public class NetworkingUtility {
         else if (request.equals("buy-car-confirmation")) {
             manageBuyCarConfirmation();
         }
+        else if (request.equals("add-car-confirmation")) {
+            manageAddCarConfirmation();
+        }
     }
 
+    private void manageAddCarConfirmation() throws IOException, ClassNotFoundException {
+        String resp = (String) read();
+
+        if (resp.equals("failed")) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("Could not add car");
+                alert.showAndWait();
+            });
+        }
+        else if (resp.equals("successful")) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setHeaderText("Successfully added car");
+                alert.showAndWait();
+            });
+        }
+    }
+
+    // manages buy car confirmation received from the server
     private void manageBuyCarConfirmation() throws IOException, ClassNotFoundException {
         String res = (String) read();
 
         if (res.equals("failed")) {
             Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Buy car request failed");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("Could not buy car");
                 alert.showAndWait();
             });
         }
         else {
             Car car = (Car) read();
+
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setContentText("Successfully brought car (Model: " + car.getModel() + ")");
+                alert.setHeaderText("Successfully brought car (Model: " + car.getModel() + ")");
                 alert.showAndWait();
             });
             getUpdatedCarListRequest();
         }
     }
 
+    // updates the car list
     private void updateCarList() throws IOException, ClassNotFoundException {
         ArrayList<Car> carList = (ArrayList<Car>) read();
         app.updateCarList(carList);
     }
 
-
-    private void manageUpdateCarList() throws IOException, ClassNotFoundException {
-        ArrayList<Car> carList = (ArrayList<Car>) read();
-
-        app.updateCarList(carList);
-    }
-
-    synchronized private void manageLoginConfirmation() throws IOException, ClassNotFoundException {
+    // manages login confirmation received from the server
+    private void manageLoginConfirmation() throws IOException, ClassNotFoundException {
         String resp = (String) read();
         if (resp.equals("as-viewer")) {
-            Debug.debug("Logging in as viewer");
-
-            setUser("viewer");
-
-//            Debug.debug("Getting all cars...");
-//            ArrayList<Car> cars = (ArrayList<Car>) read();
-//            Debug.debug("Succesfully got all cars");
-
-            getUpdatedCarListRequest();
+            setUser("viewer"); // set current user as viewer
+            getUpdatedCarListRequest(); // get the updated car list from the server
 
             Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Logging in as a viewer");
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setHeaderText("Logging in as a viewer");
                 alert.showAndWait();
-                app.showViewerHomePage();
+                app.getAllScenes().getHomePageController().setUser("viewer");
+                app.showHomePage();
             });
-
-//            app.updateCarList(cars);
         }
         else if (resp.equals("successful")) {
             String username = (String) read();
-            Debug.debug("Logging in as user: " + username);
 
-            setUser(username);
+            setUser(username); // set current user as viewer
+            getUpdatedCarListRequest(); // get the updated car list from the server
 
             Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Logging in as " + username);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setHeaderText("Logging in as " + username);
                 alert.showAndWait();
+                app.getAllScenes().getHomePageController().setUser(username);
+                app.showHomePage();
             });
         }
         else if (resp.equals("no-such-user")) {
-            Debug.debug("No such user");
-
             Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "No such user");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("No such user");
                 alert.showAndWait();
             });
         }
         else if (resp.equals("failed")) {
-            Debug.debug("Wrong password");
-
             Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Wrong password");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("Wrong password");
                 alert.showAndWait();
             });
         }
     }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    synchronized public void sendLoginRequest(String username, String password) throws IOException {
-        Debug.debug("Sending login request");
-
+    // sends a login request to the server
+    synchronized public void loginRequest(String username, String password) throws IOException {
+        Debug.debug("sending login request");
         Debug.debug("username: " + username + ", password: " + password);
 
         write("login");
         write(username);
         write(password);
 
-        Debug.debug("Successfully sent login request");
+        Debug.debug("successfully sent login request");
     }
 
-    synchronized public void sendSearchByRegRequest(String reg) throws IOException {
-        Debug.debug("Sending search by reg request");
-
-        Debug.debug("reg: " + reg);
-
+    // sends a search by registration number request
+    synchronized public void searchByRegRequest(String reg) throws IOException {
         write("search-by-reg");
         write(reg);
-
-        Debug.debug("Successfully sent search by reg request");
     }
 
+    // sends a search by make and model request
+    synchronized public void searchByMakeAndModelRequest(String make, String model) throws IOException {
+        write("search-by-make-and-model");
+        write(make);
+        write(model);
+    }
+
+    // sends a request to the server for the updated car list
     synchronized public void getUpdatedCarListRequest() throws IOException {
         write("get-updated-car-list");
     }
 
+    // sends a buy car request to the server
     synchronized public void buyCarRequest(String reg) throws IOException {
         write("buy-car");
+        write(reg);
+    }
+
+    // sends a edit car request to the server
+    synchronized public void editCarRequest(Car car) throws IOException {
+        write("edit-car");
+        write(car);
+    }
+
+    // sends a add car request to the server
+    synchronized public void addCarRequest(Car car) throws IOException {
+        write("add-car");
+        write(car);
+    }
+
+    // sends a delete car request to the server
+    synchronized public void deleteCarRequest(String reg) throws IOException {
+        write("delete-car");
         write(reg);
     }
 

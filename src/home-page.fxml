@@ -11,9 +11,9 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ViewerHomePageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="HomePageController">
    <children>
-      <Label alignment="CENTER" layoutX="640.0" layoutY="9.0" prefHeight="38.0" prefWidth="142.0" text="Logged In as Viewer">
+      <Label fx:id="userLabel" alignment="CENTER_RIGHT" layoutX="604.0" layoutY="14.0" prefHeight="38.0" prefWidth="181.0" text="Logged In as {user}">
          <font>
             <Font name="System Bold" size="15.0" />
          </font></Label>
@@ -21,22 +21,22 @@
          <children>
             <Button fx:id="refreshBtn" mnemonicParsing="false" onAction="#refreshBtnPressed" prefHeight="40.0" prefWidth="150.0" text="Refresh" />
             <Line endX="100.0" startX="-46.4000244140625" startY="-1.52587890625E-5" />
-            <VBox spacing="15.0">
+            <VBox fx:id="viewerOptions" spacing="15.0">
                <children>
                   <TextField fx:id="regField" alignment="CENTER" prefHeight="40.0" prefWidth="150.0" promptText="Registration Number" />
                   <Button fx:id="searchByRegBtn" mnemonicParsing="false" onAction="#searchByRegBtnPressed" prefHeight="40.0" prefWidth="150.0" text="Search by Reg. No." />
                   <Line endX="90.199951171875" endY="-1.52587890625E-5" startX="-53.79998779296875" startY="-1.52587890625E-5" />
                   <TextField fx:id="makeField" alignment="CENTER" prefHeight="40.0" prefWidth="150.0" promptText="Car Make" />
-                  <TextField fx:id="modelField" alignment="CENTER" editable="false" prefHeight="40.0" prefWidth="150.0" promptText="Car Model" />
-                  <Button fx:id="searchByMakeAndModelBtn" mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" text="Search by Make and Model">
+                  <TextField fx:id="modelField" alignment="CENTER" prefHeight="40.0" prefWidth="150.0" promptText="Car Model" />
+                  <Button fx:id="searchByMakeAndModelBtn" mnemonicParsing="false" onAction="#searchByMakeAndModelBtnPressed" prefHeight="40.0" prefWidth="150.0" text="Search by Make and Model">
                      <font>
                         <Font size="10.0" />
                      </font>
                   </Button>
+                  <Line endX="100.0" startX="-47.20001220703125" />
+                  <Button fx:id="buyBtn" mnemonicParsing="false" onAction="#buyBtnPressed" prefHeight="40.0" prefWidth="150.0" text="Buy" />
                </children>
             </VBox>
-            <Line endX="100.0" startX="-47.20001220703125" />
-            <Button fx:id="buyBtn" mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" text="Buy" />
             <Line endX="100.0" startX="-46.20001220703125" />
             <Button fx:id="logoutBtn" mnemonicParsing="false" onAction="#logoutBtnPressed" prefHeight="40.0" prefWidth="150.0" text="Log Out" />
          </children>
@@ -57,11 +57,11 @@
             <Font name="Oswald Medium" size="25.0" />
          </font>
       </Label>
-      <HBox disable="true" layoutX="68.0" layoutY="537.0" prefHeight="40.0" prefWidth="502.0" spacing="25.0">
+      <HBox fx:id="manufacturerOptions" layoutX="68.0" layoutY="537.0" prefHeight="40.0" prefWidth="502.0" spacing="25.0">
          <children>
-            <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" text="Edit Car" />
-            <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" text="Add Car" />
-            <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="150.0" text="Delete Car" />
+            <Button fx:id="editCarBtn" mnemonicParsing="false" onAction="#editCarBtnPressed" prefHeight="40.0" prefWidth="150.0" text="Edit Car" />
+            <Button fx:id="addCarBtn" mnemonicParsing="false" onAction="#addCarBtnPressed" prefHeight="40.0" prefWidth="150.0" text="Add Car" />
+            <Button fx:id="deleteCarBtn" mnemonicParsing="false" onAction="#deleteCarBtnPressed" prefHeight="40.0" prefWidth="150.0" text="Delete Car" />
          </children>
       </HBox>
    </children>

@@ -1,7 +1,4 @@
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
@@ -94,13 +91,64 @@ public class ClientHandler {
         else if (request.equals("search-by-reg")) {
             manageSearchByReg();
         }
-        if (request.equals("get-updated-car-list")) {
+        else if (request.equals("search-by-make-and-model")) {
+            manageSearchByMakeAndModel();
+        }
+        else if (request.equals("get-updated-car-list")) {
             manageGetUpdatedCarListRequest();
         }
         else if (request.equals("buy-car")) {
             manageBuyCarRequest();
         }
+        else if (request.equals("edit-car")) {
+            manageEditCarRequest();
+        }
+        else if (request.equals("add-car")) {
+            manageAddCarRequest();
+        }
+        else if (request.equals("delete-car")) {
+            manageDeleteCarRequest();
+        }
+    }
 
+    private void manageDeleteCarRequest() throws IOException, ClassNotFoundException, SQLException {
+        String reg = (String) read();
+
+        db.deleteCar(reg);
+
+        sendCarList(db.getAllCars());
+
+        sendUpdateCalListToAllClients();
+    }
+
+    private void manageAddCarRequest() throws IOException, ClassNotFoundException, SQLException {
+        Car car = (Car) read();
+
+        write("add-car-confirmation");
+        try {
+            db.addCar(car);
+        }
+        catch (SQLException e) {
+            Debug.debug("Could not add car");
+            write("failed");
+            sendCarList(db.getAllCars());
+            return;
+        }
+        write("successful");
+        sendCarList(db.getAllCars());
+
+        sendUpdateCalListToAllClients();
+    }
+
+    private void manageEditCarRequest() throws IOException, ClassNotFoundException, SQLException {
+        Car car = (Car) read();
+
+        db.deleteCar(car.getReg());
+        db.addCar(car);
+
+        sendCarList(db.getAllCars());
+
+        sendUpdateCalListToAllClients();
     }
 
     private void manageBuyCarRequest() throws IOException, ClassNotFoundException, SQLException {
@@ -112,6 +160,8 @@ public class ClientHandler {
         if (flag) {
             write("successful");
             write(db.getCar(reg));
+
+            sendUpdateCalListToAllClients();
         }
         else {
             write("failed");
@@ -129,47 +179,56 @@ public class ClientHandler {
         write(carList);
     }
 
-    private void manageSearchByReg() throws IOException, ClassNotFoundException {
-        Debug.debug("In manageSearchByReg()");
+    private void manageSearchByReg() throws IOException, ClassNotFoundException, SQLException {
+        Debug.debug("handling search by reg request...");
 
         String reg = (String) read();
-
         Debug.debug("reg: " + reg);
 
-        Debug.debug("Querying database...");
-        Car car = null;
-        try {
-            car = db.getCar(reg);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        if (reg.equals("")) {
+            sendCarList(db.getAllCars());
+            return;
         }
-        Debug.debug("Found: " + car);
 
+        Car car = db.getCar(reg);
         ArrayList<Car> carList = new ArrayList<>();
         if (car != null) carList.add(car);
         sendCarList(carList);
+
+        Debug.debug("handled search by reg request");
+    }
+
+    private void manageSearchByMakeAndModel() throws IOException, ClassNotFoundException, SQLException {
+        Debug.debug("handling search by make and model request");
+
+        String make = (String) read();
+        String model = (String) read();
+
+        ArrayList<Car> carList = db.getCar(make, model);
+        sendCarList(carList);
+
+        Debug.debug("handled search by make and model request");
     }
 
     private void manageLogin() throws IOException, ClassNotFoundException, SQLException {
-        Debug.debug("In manageLogin()");
+        Debug.debug("handling login request...");
 
         String username = (String) read();
         String password = (String) read();
-
         Debug.debug("username: " + username + ", password: " + password);
 
-        String actualPaasword = db.getPassword(username);
-        Debug.debug("actual password: " + actualPaasword);
+        String realPassword = db.getPassword(username);
+        Debug.debug("real password: " + realPassword);
 
         write("login-confirmation");
         if (username.equals("viewer")) {
             write("as-viewer");
             clientUsername = username;
         }
-        else if (actualPaasword == null) {
+        else if (realPassword == null) {
             write("no-such-user");
         }
-        else if (password.equals(actualPaasword)) {
+        else if (password.equals(realPassword)) {
             write("successful");
             write(username);
             clientUsername = username;
@@ -180,6 +239,16 @@ public class ClientHandler {
 
         if (clientUsername != null) {
             listeningThread.setName("ListeningThread#" + id + "<" + clientUsername + ">");
+        }
+
+        Debug.debug("Handled login request");
+    }
+
+    private void sendUpdateCalListToAllClients() throws SQLException, IOException {
+        ArrayList<Server> allServers = Server.getAllServers();
+        ArrayList<Car> carList = db.getAllCars();
+        for (Server server : allServers) {
+            server.getClientHandler().sendCarList(carList);
         }
     }
 }
