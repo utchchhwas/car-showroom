@@ -58,14 +58,10 @@ public class ClientHandler {
                     Debug.debug("Got request: " + request);
                     manageRequest(request);
                 }
-                catch (EOFException e) {
+                catch (EOFException | SocketException e) {
                     e.printStackTrace();
-                    Debug.debug("EOF reached");
-                    break;
-                }
-                catch (SocketException e) {
-                    e.printStackTrace();
-                    Debug.debug("Socket closed");
+                    Debug.debug("Client closed");
+                    removeServer();
                     break;
                 }
                 catch (IOException | ClassNotFoundException e) {
@@ -80,6 +76,17 @@ public class ClientHandler {
             Debug.debug("Closing " + Thread.currentThread().getName());
         });
         listeningThread.start();
+    }
+
+    private void removeServer() {
+        Debug.debug("Removing server#" + id);
+        ArrayList<Server> allServers = Server.getAllServers();
+        for (int i = 0; i < allServers.size(); i++) {
+            if (allServers.get(i).getServerId() == id) {
+                allServers.remove(i);
+                break;
+            }
+        }
     }
 
     private void manageRequest(String request) throws IOException, ClassNotFoundException, SQLException {

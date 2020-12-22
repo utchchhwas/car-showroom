@@ -104,7 +104,7 @@ public class NetworkingUtility {
             manageLoginConfirmation();
         }
         else if (request.equals("updated-car-list")) {
-            updateCarList();
+            manageUpdateCarList();
         }
         else if (request.equals("buy-car-confirmation")) {
             manageBuyCarConfirmation();
@@ -157,7 +157,7 @@ public class NetworkingUtility {
     }
 
     // updates the car list
-    private void updateCarList() throws IOException, ClassNotFoundException {
+    private void manageUpdateCarList() throws IOException, ClassNotFoundException {
         ArrayList<Car> carList = (ArrayList<Car>) read();
         app.updateCarList(carList);
     }

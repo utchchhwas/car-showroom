@@ -32,17 +32,17 @@ public class Car implements Serializable {
         if ((color1 != null)) {
             s.append(color1).append(",");
         } else {
-            s.append("-,");
+            s.append(",");
         }
         if ((color2 != null)) {
             s.append(color2).append(",");
         } else {
-            s.append("-,");
+            s.append(",");
         }
         if ((color3 != null)) {
             s.append(color3);
         } else {
-            s.append("-");
+            s.append("");
         }
         return s.toString();
     }

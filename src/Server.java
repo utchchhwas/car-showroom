@@ -11,6 +11,10 @@ public class Server {
     private final int serverId;
     private final ClientHandler clientHandler;
 
+    public int getServerId() {
+        return serverId;
+    }
+
     Server(Socket socket, int serverId) throws IOException {
         Debug.debug("Creating Server#" + serverId + "...");
         Debug.debug("Server#" + serverId + " is connected to " + socket.getRemoteSocketAddress());

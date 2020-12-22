@@ -32,7 +32,6 @@ public class Database {
         res = null;
     }
 
-
     synchronized public String getPassword(String username) throws SQLException {
         setConnection();
 
